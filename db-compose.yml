@@ -1,0 +1,55 @@
+version: '3.1'
+services:
+
+  ###########################
+  # fix-postgresql-permissions #
+  ###########################
+  fix-postgresql-permissions:
+    image: bitnami/postgresql:13.1.0
+    container_name: postgresql-permissions
+    user: root
+    command: chown -R 1001:1001 /bitnami
+    volumes:
+      - postgresql-data:/bitnami
+
+  ####################
+  # postgresql db primary #
+  ####################
+  postgresql:
+    image: bitnami/postgresql:13.1.0
+    container_name: postgresql
+    stop_grace_period: 1s
+    volumes:
+      - postgresql-data:/bitnami
+    networks:
+      - database-network
+    ports:
+      - "28888:28888"
+    environment:
+      - POSTGRES_PASSWORD=root_pass
+
+  ###################
+  #   portainer     #
+  ###################
+  portainer:
+    image: portainer/portainer
+    container_name: portainer
+    stop_grace_period: 1s
+    networks:
+      - database-network
+    ports:
+      - "9000:9000"
+    command: -H unix:///var/run/docker.sock --no-auth
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+networks:
+  database-network:
+    driver : bridge
+  app-network:
+    driver : bridge
+
+volumes:
+  postgresql-data:
+  portainer_data:

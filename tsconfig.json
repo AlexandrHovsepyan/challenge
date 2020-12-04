@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "moduleResolution": "Node",
+    "module": "CommonJS",
+    "allowJs": true,
+    "target": "ES6",
+    "preserveConstEnums": true,
+    "resolveJsonModule": true
+  },
+  "include": [
+    "./source/**/*",
+    "./configs/**/*.json",
+    "app.ts"
+  ]
+}

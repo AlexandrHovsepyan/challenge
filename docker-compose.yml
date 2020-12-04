@@ -1,0 +1,27 @@
+version: '3.7'
+services:
+
+  ################
+  # First service #
+  ################
+  first_service:
+    build:
+      context: "./"
+      dockerfile: "Dockerfile"
+    container_name: challenge
+    environment:
+      - postgresql_uri=postgresql://root:root_pass@localhost:28888/challenge
+      - app_server_port=5000
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./dist:/home/app
+    networks:
+      - database-network
+      - app-network
+
+networks:
+  database-network:
+    driver : bridge
+  app-network:
+    driver : bridge
