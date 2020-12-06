@@ -10,7 +10,7 @@ services:
       dockerfile: "Dockerfile"
     container_name: challenge
     environment:
-      - postgresql_uri=postgresql://root:root_pass@localhost:28888/challenge
+      - postgresql_uri=postgresql://root:root_pass@postgres:28888/challenge
       - app_server_port=5000
     ports:
       - "3001:3001"

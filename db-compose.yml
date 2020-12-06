@@ -1,32 +1,27 @@
-version: '3.1'
+version: '3.3'
 services:
 
-  ###########################
-  # fix-postgresql-permissions #
-  ###########################
-  fix-postgresql-permissions:
-    image: bitnami/postgresql:13.1.0
-    container_name: postgresql-permissions
-    user: root
-    command: chown -R 1001:1001 /bitnami
-    volumes:
-      - postgresql-data:/bitnami
-
-  ####################
-  # postgresql db primary #
-  ####################
-  postgresql:
-    image: bitnami/postgresql:13.1.0
-    container_name: postgresql
-    stop_grace_period: 1s
-    volumes:
-      - postgresql-data:/bitnami
+  ############
+  # postgres #
+  ############
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    ports:
+      - 5432:5432
     networks:
       - database-network
-    ports:
-      - "28888:28888"
+      - app-network
     environment:
+      - POSTGRES_DB=challenge
+      - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root_pass
+    volumes:
+      - /database-data:/var/lib/postgresql/data/
+      - ./postgres/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    healthcheck:
+      test: "exit 0"
 
   ###################
   #   portainer     #
@@ -51,5 +46,5 @@ networks:
     driver : bridge
 
 volumes:
-  postgresql-data:
+  database-data:
   portainer_data:
