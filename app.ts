@@ -2,11 +2,11 @@ import * as async from "async";
 import * as dotenv from "dotenv";
 dotenv.config();
 import { HttpServer } from "./source/service/HttpServer";
-// import { MongoManager } from "./source/db/mongo/MongoManager";
+import { postgresManagerInstance } from "./source/db/PostgresManager";
 import { IStartManager } from "./source/utils/IStartManager";
 
 async.eachSeries([
-    // MongoManager.getInstance(),
+    postgresManagerInstance,
     HttpServer.getInstance()
 ], async (item: IStartManager, callback: (error?: Error) => void) => {
     try {

@@ -1,5 +1,7 @@
 import * as express from "express";
 import * as morgan from "morgan";
+import * as bodyParser from "body-parser";
+import { authRouterInstance } from "../modules/auth/router";
 import { IStartManager } from "../utils/IStartManager";
 
 export class HttpServer implements IStartManager {
@@ -35,6 +37,18 @@ export class HttpServer implements IStartManager {
         if (!this.app) {
             this.app = express();
             this.app.use(morgan("dev"));
+            this.app.use(bodyParser.json());
+            this.app.use(bodyParser.urlencoded({ extended: true }));
+
+            this.app.use("/auth", authRouterInstance.router);
+
+            this.app.use((error, req, res, next) => {
+                //todo must improved (Error classes and statuses)
+                res.status(error.status || 500).json({
+                    message: "Something went wrong",
+                    error: error.message || error
+                });
+            })
 
             this.app.listen(this.port, () => {
                 console.log(`Server is running in http://localhost:${this.port}`);
