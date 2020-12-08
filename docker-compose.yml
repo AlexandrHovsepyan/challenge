@@ -2,7 +2,7 @@ version: '3.7'
 services:
 
   ################
-  # challenge service #
+  # challenge services #
   ################
   challenge_service:
     build:
@@ -16,6 +16,8 @@ services:
       - "3001:3001"
     volumes:
       - ./dist:/home/app
+      - ./package.json:/home/package.json
+      - ./tsconfig.json:/home/tsconfig.json
     networks:
       - database-network
       - app-network

@@ -1,50 +1,49 @@
 import { Repository } from "typeorm";
-import { User } from "../modules/users/model";
-import { userSignUpSchema, userSignInSchema } from "../validators/user";
-import { postgresManagerInstance } from "../db/PostgresManager";
-import { generatePassword, comparePassword } from "../utils/bcrypt";
+import { User } from "app/modules/users/model";
+import { userSignUpSchema, userSignInSchema } from "app/validators/user";
+import { postgresManagerInstance } from "app/db/PostgresManager";
+import {FindOneOptions} from "typeorm/find-options/FindOneOptions";
 
 class UserService {
     private userRepository: Repository<User>
 
-    public async create(requestBody): Promise<User> {
+    public async create(requestBody: Partial<Omit<User, 'id'>>): Promise<User> {
         const { error, value } = userSignUpSchema.validate(requestBody);
         if (error) throw error;
         this.userRepository = postgresManagerInstance.connection.getRepository(User);
 
         value.email = value.email.toLowerCase();
-        const userInDb = await this.findOneByQuery({ email: value.email });
+        const userInDb = await this.findOneByQuery({ where: { email: value.email } });
 
         if (userInDb) {
             throw new Error("User with this email already exists");
         }
 
-        value.password = await generatePassword(value.password);
         const newUser = new User();
-        newUser.first_name = value.first_name;
-        newUser.second_name = value.second_name;
+        newUser.firstName = value.firstName;
+        newUser.secondName = value.secondName;
         newUser.email = value.email;
         newUser.password = value.password;
         return this.userRepository.save(newUser);
     }
 
-    public async findOneByQuery(query): Promise<User> {
+    public async findOneByQuery (query?: FindOneOptions<User>): Promise<User | undefined> {
         return this.userRepository.findOne(query);
     }
 
-    public async singIn(requestBody): Promise<User> {
+    public async singIn(requestBody: Partial<Omit<User, 'id'>>): Promise<User> {
         const { error, value } = userSignInSchema.validate(requestBody);
         if (error) throw error;
         this.userRepository = postgresManagerInstance.connection.getRepository(User);
 
         value.email = value.email.toLowerCase();
-        const userInDb = await this.findOneByQuery({ email: value.email });
+        const userInDb = await this.findOneByQuery({ where: { email: value.email } });
 
         if (!userInDb) {
-            throw new Error("User with this email address doesn't exist");
+            throw new Error("Wrong email or password");
         }
 
-        const isValid  = await comparePassword(value.password, userInDb.password);
+        const isValid  = await userInDb.comparePassword(value.password);
         if (isValid) {
             return userInDb;
         }

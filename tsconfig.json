@@ -3,16 +3,19 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "outDir": "./dist",
-    "moduleResolution": "Node",
+    "moduleResolution": "node",
     "module": "CommonJS",
     "allowJs": true,
     "target": "ES6",
     "preserveConstEnums": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": "./source",
+    "paths": {
+      "app/*": ["./*"]
+    }
   },
   "include": [
     "./source/**/*",
-    "./configs/**/*.json",
     "app.ts"
   ]
 }

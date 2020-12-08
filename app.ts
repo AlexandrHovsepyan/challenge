@@ -1,9 +1,10 @@
 import * as async from "async";
 import * as dotenv from "dotenv";
+import "module-alias/register";
 dotenv.config();
-import { HttpServer } from "./source/service/HttpServer";
-import { postgresManagerInstance } from "./source/db/PostgresManager";
-import { IStartManager } from "./source/utils/IStartManager";
+import { HttpServer } from "app/http/HttpServer";
+import {postgresManagerInstance} from "app/db/PostgresManager";
+import { IStartManager } from "app/types/IStartManager";
 
 async.eachSeries([
     postgresManagerInstance,

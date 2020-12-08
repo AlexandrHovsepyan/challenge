@@ -2,6 +2,7 @@ FROM node:alpine
 VOLUME ["/home/app"]
 EXPOSE 5000
 COPY package.json /home/
+COPY tsconfig.json /home/
 COPY .env /home/
 RUN chmod -R 0644 /home/
 WORKDIR /home/

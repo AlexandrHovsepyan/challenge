@@ -1,8 +1,8 @@
 import * as express from "express";
 import * as morgan from "morgan";
 import * as bodyParser from "body-parser";
-import { authRouterInstance } from "../modules/auth/router";
-import { IStartManager } from "../utils/IStartManager";
+import { authRouterInstance } from "app/modules/auth/router";
+import { IStartManager } from "app/types/IStartManager";
 
 export class HttpServer implements IStartManager {
     private static instance: HttpServer;

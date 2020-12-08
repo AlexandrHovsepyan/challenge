@@ -1,4 +1,4 @@
-import UserService from "../../service/UserService";
+import UserService from "app/services/UserService";
 
 class UserController {
     public async create(requestBody) {

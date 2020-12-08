@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { createConnection, Connection } from "typeorm";
-import { User } from "../modules/users/model";
-import { IStartManager } from "../utils/IStartManager";
+import { User } from "app/modules/users/model";
+import { IStartManager } from "app/types/IStartManager";
 
 class PostgresManager implements IStartManager {
     private postgresConnection: Connection;

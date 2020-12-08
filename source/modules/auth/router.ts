@@ -1,6 +1,6 @@
 import * as express from "express";
 import { Request, Response, NextFunction } from "express";
-import  UserService  from "../../service/UserService";
+import  UserService  from "app/services/UserService";
 import { AuthController } from "./controller";
 
 class AuthRouter {

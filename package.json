@@ -26,8 +26,15 @@
     "typeorm": "^0.2.29",
     "typescript": "^4.1.2"
   },
+  "_moduleAliases": {
+    "app": "app/source"
+  },
+  "_moduleDirectories": [
+    "source"
+  ],
   "devDependencies": {
     "@types/async": "^3.2.5",
-    "@types/node": "^14.14.10"
+    "@types/node": "^14.14.10",
+    "module-alias": "^2.2.2"
   }
 }

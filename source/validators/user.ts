@@ -1,13 +1,13 @@
 import * as Joi from "joi";
 
-export const userSignUpSchema: Joi.ObjectSchema = Joi.object({
-    first_name: Joi.string()
+export const userSignUpSchema = Joi.object({
+    firstName: Joi.string()
         .alphanum()
         .min(3)
         .max(30)
         .required(),
 
-    second_name: Joi.string()
+    secondName: Joi.string()
         .alphanum()
         .min(3)
         .max(30)
@@ -24,7 +24,7 @@ export const userSignUpSchema: Joi.ObjectSchema = Joi.object({
         .required()
 });
 
-export const userSignInSchema: Joi.ObjectSchema = Joi.object({
+export const userSignInSchema = Joi.object({
     email: Joi.string()
         .email({
             minDomainSegments: 2
