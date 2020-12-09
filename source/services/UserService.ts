@@ -13,7 +13,7 @@ class UserService {
         this.userRepository = postgresManagerInstance.connection.getRepository(User);
 
         value.email = value.email.toLowerCase();
-        const userInDb = await this.findOneByQuery({ where: { email: value.email } });
+        const userInDb = await this.findOneByEmail(value.email);
 
         if (userInDb) {
             throw new Error("User with this email already exists");
@@ -27,8 +27,8 @@ class UserService {
         return this.userRepository.save(newUser);
     }
 
-    public async findOneByQuery (query?: FindOneOptions<User>): Promise<User | undefined> {
-        return this.userRepository.findOne(query);
+    public async findOneByEmail(email: string): Promise<User | undefined> {
+        return this.userRepository.findOne({ where: { email }});
     }
 
     public async singIn(requestBody: Partial<Omit<User, 'id'>>): Promise<User> {
@@ -37,7 +37,7 @@ class UserService {
         this.userRepository = postgresManagerInstance.connection.getRepository(User);
 
         value.email = value.email.toLowerCase();
-        const userInDb = await this.findOneByQuery({ where: { email: value.email } });
+        const userInDb = await this.findOneByEmail(value.email);
 
         if (!userInDb) {
             throw new Error("Wrong email or password");

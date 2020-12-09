@@ -1,13 +1,18 @@
 import * as express from "express";
 import * as morgan from "morgan";
 import * as bodyParser from "body-parser";
+import { createServer } from "http";
+import { Server, Socket } from "socket.io";
 import { authRouterInstance } from "app/modules/auth/router";
+import { userRouter } from "app/modules/users/router";
 import { IStartManager } from "app/types/IStartManager";
+import  SocketController  from "app/lib/socket";
 
 export class HttpServer implements IStartManager {
     private static instance: HttpServer;
     private app: express.Application;
     private readonly _port: number;
+    private io: SocketController;
 
     constructor(enforce: () => void) {
         if (enforce !== Enforce) {
@@ -39,8 +44,10 @@ export class HttpServer implements IStartManager {
             this.app.use(morgan("dev"));
             this.app.use(bodyParser.json());
             this.app.use(bodyParser.urlencoded({ extended: true }));
+            this.io = new SocketController(new Server(createServer(this.app)));
 
             this.app.use("/auth", authRouterInstance.router);
+            this.app.use("/users", userRouter);
 
             this.app.use((error, req, res, next) => {
                 //todo must improved (Error classes and statuses)
