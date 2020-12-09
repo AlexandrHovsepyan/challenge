@@ -1,13 +1,19 @@
 import * as express from "express";
 import * as morgan from "morgan";
 import * as bodyParser from "body-parser";
+import { createServer } from "http";
+import { Server, Socket } from "socket.io";
 import { authRouterInstance } from "app/modules/auth/router";
+import { userRouter } from "app/modules/users/router";
 import { IStartManager } from "app/types/IStartManager";
+import SocketController from "app/lib/socket";
 
 export class HttpServer implements IStartManager {
     private static instance: HttpServer;
     private app: express.Application;
     private readonly _port: number;
+    private io: Server;
+    private server;
 
     constructor(enforce: () => void) {
         if (enforce !== Enforce) {
@@ -40,7 +46,11 @@ export class HttpServer implements IStartManager {
             this.app.use(bodyParser.json());
             this.app.use(bodyParser.urlencoded({ extended: true }));
 
+            this.server = createServer(this.app);
+            new SocketController(new Server(this.server));
+
             this.app.use("/auth", authRouterInstance.router);
+            this.app.use("/users", userRouter);
 
             this.app.use((error, req, res, next) => {
                 //todo must improved (Error classes and statuses)
@@ -48,9 +58,9 @@ export class HttpServer implements IStartManager {
                     message: "Something went wrong",
                     error: error.message || error
                 });
-            })
+            });
 
-            this.app.listen(this.port, () => {
+            this.server.listen(this.port, () => {
                 console.log(`Server is running in http://localhost:${this.port}`);
             });
         } else {

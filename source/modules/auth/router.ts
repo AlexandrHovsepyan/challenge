@@ -2,6 +2,7 @@ import * as express from "express";
 import { Request, Response, NextFunction } from "express";
 import  UserService  from "app/services/UserService";
 import { AuthController } from "./controller";
+import { generateToken } from "app/utils/jwt-token";
 
 class AuthRouter {
     public router: express.Router;
@@ -23,7 +24,7 @@ class AuthRouter {
             }
 
             const user = await UserService.create(req.body);
-            const token = AuthController.generateToken(user.email);
+            const token = generateToken(user.email);
             return res.status(201).json({
                 success: true,
                 token
@@ -42,7 +43,7 @@ class AuthRouter {
                 });
             }
             const user = await UserService.singIn(req.body);
-            const token = AuthController.generateToken(user.email);
+            const token = generateToken(user.email);
             return res.status(200).json({
                 success: true,
                 token
