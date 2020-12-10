@@ -4,6 +4,6 @@ export interface IUser {
     secondName?: string
     email?: string,
     password?: string,
-    createdAt?: string,
-    updatedAt?: string
+    createdAt?: Date,
+    updatedAt?: Date
 }

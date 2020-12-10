@@ -18,6 +18,7 @@ services:
       - ./dist:/home/app
       - ./package.json:/home/package.json
       - ./tsconfig.json:/home/tsconfig.json
+      - ./client.html:/home/client.html
     networks:
       - database-network
       - app-network

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="http://localhost:3001/socket.io/socket.io.js"></script>
+    <title>Document</title>
+</head>
+<body>
+ <script>
+     let socket = io("http://localhost:3001", {
+             auth: {
+                 token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyRW1haWwiOiJweGlrNDU1QHB4aWsuY29tIiwiaWF0IjoxNjA3NjA1OTM1LCJleHAiOjE2MDg0Njk5MzV9.oMwy7OJPUfuNf0eaMvjRLqSB7jYe6COt-HWqhTfzsQY"
+             }
+         });
+     socket.on('connect_error', function(err){
+         // do something with err
+         console.log(err);
+     });
+ </script>
+</body>
+</html>

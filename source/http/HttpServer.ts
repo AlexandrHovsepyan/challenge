@@ -12,7 +12,8 @@ export class HttpServer implements IStartManager {
     private static instance: HttpServer;
     private app: express.Application;
     private readonly _port: number;
-    private io: SocketController;
+    private io: Server;
+    private server;
 
     constructor(enforce: () => void) {
         if (enforce !== Enforce) {
@@ -44,10 +45,15 @@ export class HttpServer implements IStartManager {
             this.app.use(morgan("dev"));
             this.app.use(bodyParser.json());
             this.app.use(bodyParser.urlencoded({ extended: true }));
-            this.io = new SocketController(new Server(createServer(this.app)));
+
+            this.server = createServer(this.app);
+            new SocketController(new Server(this.server));
 
             this.app.use("/auth", authRouterInstance.router);
             this.app.use("/users", userRouter);
+            this.app.use("/", (req, res, next) => {
+                res.sendFile("/home/client.html");
+            });
 
             this.app.use((error, req, res, next) => {
                 //todo must improved (Error classes and statuses)
@@ -55,9 +61,9 @@ export class HttpServer implements IStartManager {
                     message: "Something went wrong",
                     error: error.message || error
                 });
-            })
+            });
 
-            this.app.listen(this.port, () => {
+            this.server.listen(this.port, () => {
                 console.log(`Server is running in http://localhost:${this.port}`);
             });
         } else {

@@ -4,7 +4,7 @@ import { IUser } from "app/types/IUser";
 import { NextFunction, Request, Response } from "express";
 
 class UserController {
-    public async create(requestBody) {
+    public async create(requestBody: IUser) {
         try {
             return await UserService.create(requestBody);
         } catch (error) {
