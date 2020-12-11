@@ -1,13 +1,20 @@
 import { Server, Namespace, Socket} from "socket.io";
+import { createAdapter } from "socket.io-redis";
 import { verify } from "jsonwebtoken";
+import { cacheServiceInstance } from "app/lib/redis";
 
 export default class SocketController {
-    private socket: Server;
+    private readonly socket: Server;
     private challenge: Namespace;
 
     constructor(io: Server) {
         this.socket = io;
+        this.socket.adapter(createAdapter({pubClient: cacheServiceInstance.client, subClient: cacheServiceInstance.client.duplicate()}));
         this.emmitConnection();
+    }
+
+    public get io(): Server {
+        return this.socket;
     }
 
     public socketAuthentication(socket: Socket, next: Function) {

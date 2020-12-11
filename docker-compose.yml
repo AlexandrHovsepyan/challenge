@@ -22,9 +22,12 @@ services:
     networks:
       - database-network
       - app-network
+      - redis-network
 
 networks:
   database-network:
     driver : bridge
+  redis-network:
+    driver: bridge
   app-network:
     driver : bridge

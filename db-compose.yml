@@ -23,11 +23,15 @@ services:
     healthcheck:
       test: "exit 0"
 
-  # Redis Service
+  #########
+  # redis #
+  #########
   redis:
     image: redis
-    ports:
-      - 6380:6380
+    container_name: redis
+    command: ["redis-server", "--bind", "redis", "--port", "6380"]
+    networks:
+      - redis-network
 
 
   ###################
@@ -49,6 +53,8 @@ services:
 networks:
   database-network:
     driver : bridge
+  redis-network:
+    driver: bridge
   app-network:
     driver : bridge
 
