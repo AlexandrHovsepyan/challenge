@@ -12,9 +12,14 @@
  <script>
      let socket = io("http://localhost:3001", {
              auth: {
-                 token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyRW1haWwiOiJweGlrNDU1QHB4aWsuY29tIiwiaWF0IjoxNjA3NjA1OTM1LCJleHAiOjE2MDg0Njk5MzV9.oMwy7OJPUfuNf0eaMvjRLqSB7jYe6COt-HWqhTfzsQY"
+                 token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyRW1haWwiOiJweGlrNDUwNUBweGlrLmNvbSIsImlhdCI6MTYwNzc4NzkxMSwiZXhwIjoxNjA4NjUxOTExfQ.gQ3_sNvtB_QPkArcIPQFXBXoL3PPlYdipyxVqylrwOY"
              }
          });
+
+     socket.emit("onlineUsers");
+
+     socket.on("onlineUsersList", (users) => console.log(users));
+
      socket.on('connect_error', function(err){
          // do something with err
          console.log(err);

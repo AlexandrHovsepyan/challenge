@@ -2,6 +2,7 @@ import { Server, Namespace, Socket} from "socket.io";
 import { createAdapter } from "socket.io-redis";
 import { verify } from "jsonwebtoken";
 import { cacheServiceInstance } from "app/lib/redis";
+import { cacheDbInstance } from "app/lib/cacheDb";
 
 export default class SocketController {
     private readonly socket: Server;
@@ -33,10 +34,20 @@ export default class SocketController {
     public emmitConnection(): void {
         this.socket.use(this.socketAuthentication);
 
-        this.socket.on("connection", (socket: Socket) => {
-            console.log("connection");
-            socket.on("message", (message) => {
-                console.log(message);
+        this.socket.on("connection", async (socket: Socket) => {
+            let userEmail = (socket as { userEmail?: string }).userEmail;
+            await cacheDbInstance.saveInCache(userEmail, socket.id);
+
+            socket.on("onlineUsers", async () => {
+                let onlineUsers = await cacheDbInstance.getKeysFromCache();
+                let indexOfCurrentUser = onlineUsers.indexOf(userEmail);
+                onlineUsers.splice(indexOfCurrentUser, 1);
+                socket.emit("onlineUsersList", JSON.stringify(onlineUsers));
+            });
+
+            socket.on("disconnect", async () => {
+                await cacheDbInstance.removeKeyFromCache(userEmail);
+                console.log("disconnect");
             });
         });
     }
