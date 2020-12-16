@@ -2,7 +2,6 @@ import { Repository } from "typeorm";
 import { User } from "app/modules/users/model";
 import { userSignUpSchema, userSignInSchema } from "app/validators/user";
 import { postgresManagerInstance } from "app/db/PostgresManager";
-import {FindOneOptions} from "typeorm/find-options/FindOneOptions";
 
 class UserService {
     private userRepository: Repository<User>

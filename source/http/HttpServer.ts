@@ -1,6 +1,7 @@
 import * as express from "express";
 import * as morgan from "morgan";
 import * as bodyParser from "body-parser";
+import * as cors from "cors";
 import { createServer } from "http";
 import { Server, Socket } from "socket.io";
 import { authRouterInstance } from "app/modules/auth/router";
@@ -12,7 +13,7 @@ export class HttpServer implements IStartManager {
     private static instance: HttpServer;
     private app: express.Application;
     private readonly _port: number;
-    private io: Server;
+    private io: SocketController;
     private server;
 
     constructor(enforce: () => void) {
@@ -40,35 +41,35 @@ export class HttpServer implements IStartManager {
     }
 
     public start(): void {
-        if (!this.app) {
-            this.app = express();
-            this.app.use(morgan("dev"));
-            this.app.use(bodyParser.json());
-            this.app.use(bodyParser.urlencoded({ extended: true }));
+        if (this.app) throw new Error("HttpServer: You can call 'start' function only once");
 
-            this.server = createServer(this.app);
-            new SocketController(new Server(this.server));
+        this.app = express();
+        this.app.use(cors());
+        this.app.use(morgan("dev"));
+        this.app.use(bodyParser.json());
+        this.app.use(bodyParser.urlencoded({ extended: true }));
 
-            this.app.use("/auth", authRouterInstance.router);
-            this.app.use("/users", userRouter);
-            this.app.use("/", (req, res, next) => {
-                res.sendFile("/home/client.html");
+        this.server = createServer(this.app);
+        this.io = new SocketController(new Server(this.server));
+
+        this.app.use("/auth", authRouterInstance.router);
+        this.app.use("/users", userRouter);
+        this.app.use("/", (req, res, next) => {
+            res.sendFile("/home/client.html");
+        });
+
+        this.app.use((error, req, res, next) => {
+            //todo must improved (Error classes and statuses)
+            console.log(error);
+            res.status(error.status || 500).json({
+                message: "Something went wrong",
+                error: error.message || error
             });
+        });
 
-            this.app.use((error, req, res, next) => {
-                //todo must improved (Error classes and statuses)
-                res.status(error.status || 500).json({
-                    message: "Something went wrong",
-                    error: error.message || error
-                });
-            });
-
-            this.server.listen(this.port, () => {
-                console.log(`Server is running in http://localhost:${this.port}`);
-            });
-        } else {
-            throw new Error("HttpServer: You can call 'start' function only once");
-        }
+        this.server.listen(this.port, () => {
+            console.log(`Server is running in http://localhost:${this.port}`);
+        });
     }
 }
 

@@ -21,7 +21,9 @@ export const userSignUpSchema = Joi.object({
 
     password: Joi.string()
         .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
-        .required()
+        .required(),
+
+    confirmPassword: Joi.ref("password")
 });
 
 export const userSignInSchema = Joi.object({
