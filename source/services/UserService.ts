@@ -1,15 +1,18 @@
 import { Repository } from "typeorm";
 import { User } from "app/modules/users/model";
 import { userSignUpSchema, userSignInSchema } from "app/validators/user";
-import { postgresManagerInstance } from "app/db/PostgresManager";
+import { dbManagerInstance } from "app/db/dbManager";
 
-class UserService {
-    private userRepository: Repository<User>
+export default class UserService {
+    private userRepository: Repository<User>;
+
+    constructor() {
+        this.userRepository = dbManagerInstance.connection.getRepository(User);
+    }
 
     public async create(requestBody: Partial<Omit<User, 'id'>>): Promise<User> {
         const { error, value } = userSignUpSchema.validate(requestBody);
         if (error) throw error;
-        this.userRepository = postgresManagerInstance.connection.getRepository(User);
 
         value.email = value.email.toLowerCase();
         const userInDb = await this.findOneByEmail(value.email);
@@ -33,7 +36,6 @@ class UserService {
     public async singIn(requestBody: Partial<Omit<User, 'id'>>): Promise<User> {
         const { error, value } = userSignInSchema.validate(requestBody);
         if (error) throw error;
-        this.userRepository = postgresManagerInstance.connection.getRepository(User);
 
         value.email = value.email.toLowerCase();
         const userInDb = await this.findOneByEmail(value.email);
@@ -42,7 +44,7 @@ class UserService {
             throw new Error("Wrong email or password");
         }
 
-        const isValid  = await userInDb.comparePassword(value.password);
+        const isValid = await userInDb.comparePassword(value.password);
         if (isValid) {
             return userInDb;
         }
@@ -50,4 +52,3 @@ class UserService {
         throw new Error("Wrong email or password");
     }
 }
-export default new UserService();

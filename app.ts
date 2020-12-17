@@ -3,11 +3,11 @@ import * as dotenv from "dotenv";
 import "module-alias/register";
 dotenv.config();
 import { HttpServer } from "app/http/HttpServer";
-import {postgresManagerInstance} from "app/db/PostgresManager";
+import { dbManagerInstance } from "app/db/dbManager";
 import { IStartManager } from "app/types/IStartManager";
 
 async.eachSeries([
-    postgresManagerInstance,
+    dbManagerInstance,
     HttpServer.getInstance()
 ], async (item: IStartManager, callback: (error?: Error) => void) => {
     try {

@@ -3,18 +3,18 @@ import { createConnection, Connection } from "typeorm";
 import { User } from "app/modules/users/model";
 import { IStartManager } from "app/types/IStartManager";
 
-class PostgresManager implements IStartManager {
-    private postgresConnection: Connection;
+class DbManager implements IStartManager {
+    private dbConnection: Connection;
     private connected: boolean = false;
 
     public get connection(): Connection {
-        return this.postgresConnection;
+        return this.dbConnection;
     }
 
     public async start(): Promise<void> {
-        if (this.postgresConnection != null) throw new Error("PostgresManager: You can call 'start' function only once");
+        if (this.dbConnection != null) throw new Error("DbManager: You can call 'start' function only once");
 
-        this.postgresConnection = await createConnection({
+        this.dbConnection = await createConnection({
             type: "postgres",
             host: process.env.POSTGRESQL_HOST,
             port: +process.env.POSTGRESQL_PORT,
@@ -28,11 +28,11 @@ class PostgresManager implements IStartManager {
             logging: false
         });
 
-        if (this.postgresConnection) {
+        if (this.dbConnection) {
             this.connected = true;
-            console.log("PostgresManager: connected");
+            console.log("DbManager: connected");
         }
     }
 }
 
-export let postgresManagerInstance = new PostgresManager();
+export let dbManagerInstance = new DbManager();

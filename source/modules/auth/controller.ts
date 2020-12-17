@@ -1,10 +1,50 @@
-import * as jwt from "jsonwebtoken";
+import { NextFunction, Request, Response } from "express";
+import UserService from "app/services/UserService";
+import { generateToken } from "app/utils/jwt-token";
 
-export class AuthController {
-    public static generateToken(userEmail: string): string {
-        const token = jwt.sign({ userEmail }, process.env.JWT_SECRET, {
-            expiresIn: '10d'
-        });
-        return token;
+class AuthController {
+
+    public async signUp(req: Request, res: Response, next: NextFunction): Promise<Response> {
+        try {
+            if (!Object.keys(req.body).length) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Empty request body"
+                });
+            }
+            let userServiceInstance = new UserService();
+
+            const user = await userServiceInstance.create(req.body);
+            const token = generateToken(user.email);
+            return res.status(201).json({
+                success: true,
+                token
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    public async signIn(req: Request, res: Response, next: NextFunction): Promise<Response> {
+        try {
+            if (!Object.keys(req.body).length) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Empty request body"
+                });
+            }
+            let userServiceInstance = new UserService();
+
+            const user = await userServiceInstance.singIn(req.body);
+            const token = generateToken(user.email);
+            return res.status(200).json({
+                success: true,
+                token
+            });
+        } catch (error) {
+            next(error);
+        }
     }
 }
+
+export let authControllerInstance = new AuthController();

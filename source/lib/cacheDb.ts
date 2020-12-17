@@ -1,6 +1,12 @@
+import { RedisClient } from "redis";
 import { cacheServiceInstance } from "app/lib/redis";
 
 class CacheDb {
+
+    public get cacheServiceClient(): RedisClient {
+        return cacheServiceInstance.client;
+    }
+
     public saveInCache(key: string, value: string): Promise<string> {
         return cacheServiceInstance.set(key, value);
     }

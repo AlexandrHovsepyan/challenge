@@ -1,7 +1,6 @@
-import * as express from "express";
+import { Router } from "express";
 import { userControllerInstance } from "app/modules/users/controller";
 
-export const userRouter: express.Router = express.Router();
+export const userRouter: Router = Router();
 
 userRouter.get("/", userControllerInstance.authenticatedUsers);
-

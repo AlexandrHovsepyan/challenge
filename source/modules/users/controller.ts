@@ -1,4 +1,4 @@
-import userService from "app/services/UserService";
+import UserService from "app/services/UserService";
 import { isTokenValid } from "app/utils/jwt-token";
 import { IUser } from "app/types/IUser";
 import { NextFunction, Request, Response } from "express";
@@ -6,7 +6,8 @@ import { NextFunction, Request, Response } from "express";
 class UserController {
     public async create(requestBody: IUser) {
         try {
-            return await userService.create(requestBody);
+            let userServiceInstance = new UserService();
+            return await userServiceInstance.create(requestBody);
         } catch (error) {
             throw error;
         }

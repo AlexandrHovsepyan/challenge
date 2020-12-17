@@ -1,7 +1,6 @@
 import { Server, Namespace, Socket} from "socket.io";
 import { createAdapter } from "socket.io-redis";
 import { verify } from "jsonwebtoken";
-import { cacheServiceInstance } from "app/lib/redis";
 import { cacheDbInstance } from "app/lib/cacheDb";
 
 export default class SocketController {
@@ -10,8 +9,15 @@ export default class SocketController {
 
     constructor(io: Server) {
         this.socket = io;
-        this.socket.adapter(createAdapter({pubClient: cacheServiceInstance.client, subClient: cacheServiceInstance.client.duplicate()}));
+        this.socket.adapter(createAdapter({
+            pubClient: cacheDbInstance.cacheServiceClient,
+            subClient: cacheDbInstance.cacheServiceClient.duplicate()
+        }));
         this.emmitConnection();
+    }
+
+    public static attach(io: Server): void {
+        new this(io);
     }
 
     public get io(): Server {

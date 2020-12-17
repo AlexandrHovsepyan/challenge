@@ -2,19 +2,18 @@ import * as express from "express";
 import * as morgan from "morgan";
 import * as bodyParser from "body-parser";
 import * as cors from "cors";
-import { createServer } from "http";
-import { Server, Socket } from "socket.io";
-import { authRouterInstance } from "app/modules/auth/router";
+import { createServer, Server as HttpModuleServer } from "http";
+import { Server } from "socket.io";
+import { authRouter } from "app/modules/auth/router";
 import { userRouter } from "app/modules/users/router";
 import { IStartManager } from "app/types/IStartManager";
-import  SocketController  from "app/lib/socket";
+import SocketController from "app/lib/socket";
 
 export class HttpServer implements IStartManager {
     private static instance: HttpServer;
     private app: express.Application;
     private readonly _port: number;
-    private io: SocketController;
-    private server;
+    private server: HttpModuleServer;
 
     constructor(enforce: () => void) {
         if (enforce !== Enforce) {
@@ -50,9 +49,9 @@ export class HttpServer implements IStartManager {
         this.app.use(bodyParser.urlencoded({ extended: true }));
 
         this.server = createServer(this.app);
-        this.io = new SocketController(new Server(this.server));
+        SocketController.attach(new Server(this.server));
 
-        this.app.use("/auth", authRouterInstance.router);
+        this.app.use("/auth", authRouter);
         this.app.use("/users", userRouter);
         this.app.use("/", (req, res, next) => {
             res.sendFile("/home/client.html");

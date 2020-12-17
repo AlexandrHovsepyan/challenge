@@ -1,57 +1,8 @@
-import * as express from "express";
-import { Request, Response, NextFunction } from "express";
-import  UserService  from "app/services/UserService";
-import { AuthController } from "./controller";
-import { generateToken } from "app/utils/jwt-token";
+import { Router } from "express";
+import { authControllerInstance } from "app/modules/auth/controller";
 
-class AuthRouter {
-    public router: express.Router;
+export const authRouter: Router = Router();
 
-    constructor() {
-        this.router = express.Router();
-        this.router
-            .post("/signup", this.signUp)
-            .post("/signin", this.signIn);
-    }
+authRouter.post("/signup", authControllerInstance.signUp);
 
-    public async signUp(req: Request, res: Response, next: NextFunction): Promise<Response> {
-        try {
-            if (!Object.keys(req.body).length) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Empty request body"
-                });
-            }
-
-            const user = await UserService.create(req.body);
-            const token = generateToken(user.email);
-            return res.status(201).json({
-                success: true,
-                token
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    public async signIn(req: Request, res: Response, next: NextFunction): Promise<Response> {
-        try {
-            if (!Object.keys(req.body).length) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Empty request body"
-                });
-            }
-            const user = await UserService.singIn(req.body);
-            const token = generateToken(user.email);
-            return res.status(200).json({
-                success: true,
-                token
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
-}
-
-export let authRouterInstance = new AuthRouter();
+authRouter.post("/signin", authControllerInstance.signIn);
