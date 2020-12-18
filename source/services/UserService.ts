@@ -10,6 +10,14 @@ export default class UserService {
         this.userRepository = dbManagerInstance.connection.getRepository(User);
     }
 
+    private static _instance: UserService;
+
+    public static get instance(): UserService {
+        UserService._instance = UserService._instance || new UserService();
+        return UserService._instance;
+    }
+
+
     public async create(requestBody: Partial<Omit<User, 'id'>>): Promise<User> {
         const { error, value } = userSignUpSchema.validate(requestBody);
         if (error) throw error;

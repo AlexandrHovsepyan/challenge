@@ -12,9 +12,8 @@ class AuthController {
                     message: "Empty request body"
                 });
             }
-            let userServiceInstance = new UserService();
 
-            const user = await userServiceInstance.create(req.body);
+            const user = await UserService.instance.create(req.body);
             const token = generateToken(user.email);
             return res.status(201).json({
                 success: true,
@@ -33,9 +32,8 @@ class AuthController {
                     message: "Empty request body"
                 });
             }
-            let userServiceInstance = new UserService();
 
-            const user = await userServiceInstance.singIn(req.body);
+            const user = await UserService.instance.singIn(req.body);
             const token = generateToken(user.email);
             return res.status(200).json({
                 success: true,

@@ -6,8 +6,7 @@ import { NextFunction, Request, Response } from "express";
 class UserController {
     public async create(requestBody: IUser) {
         try {
-            let userServiceInstance = new UserService();
-            return await userServiceInstance.create(requestBody);
+            return await UserService.instance.create(requestBody);
         } catch (error) {
             throw error;
         }
