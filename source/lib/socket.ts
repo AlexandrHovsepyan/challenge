@@ -9,6 +9,7 @@ export default class SocketController {
 
     constructor(io: Server) {
         this.socket = io;
+        this.challenge = this.socket.of("/challenge");
         this.socket.adapter(createAdapter({
             pubClient: cacheDbInstance.cacheServiceClient,
             subClient: cacheDbInstance.cacheServiceClient.duplicate()
@@ -25,7 +26,7 @@ export default class SocketController {
     }
 
     public socketAuthentication(socket: Socket, next: Function) {
-        const token = (socket.handshake.auth as { token?: string }).token;
+        const token = (socket.handshake.query as { token?: string }).token;
         if (token) {
             verify(token, process.env.JWT_SECRET, (err, decoded) => {
                if (err) return next(new Error('Authentication error'));
@@ -38,10 +39,11 @@ export default class SocketController {
     }
 
     public emmitConnection(): void {
-        this.socket.use(this.socketAuthentication);
+        this.challenge.use(this.socketAuthentication);
 
-        this.socket.on("connection", async (socket: Socket) => {
+        this.challenge.on("connection", async (socket: Socket) => {
             let userEmail = (socket as { userEmail?: string }).userEmail;
+            console.log("connection", userEmail);
             await cacheDbInstance.saveInCache(userEmail, socket.id);
 
             socket.on("onlineUsers", async () => {
@@ -53,7 +55,7 @@ export default class SocketController {
 
             socket.on("disconnect", async () => {
                 await cacheDbInstance.removeKeyFromCache(userEmail);
-                console.log("disconnect");
+                console.log("disconnect", userEmail);
             });
         });
     }

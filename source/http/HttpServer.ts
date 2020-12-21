@@ -49,13 +49,14 @@ export class HttpServer implements IStartManager {
         this.app.use(bodyParser.urlencoded({ extended: true }));
 
         this.server = createServer(this.app);
-        SocketController.attach(new Server(this.server));
+        SocketController.attach(new Server(this.server, {
+            cors: {
+                origin: "*"
+            }
+        }));
 
         this.app.use("/auth", authRouter);
         this.app.use("/users", userRouter);
-        this.app.use("/", (req, res, next) => {
-            res.sendFile("/home/client.html");
-        });
 
         this.app.use((error, req, res, next) => {
             //todo must improved (Error classes and statuses)

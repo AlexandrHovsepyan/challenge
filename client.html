@@ -10,11 +10,12 @@
 </head>
 <body>
  <script>
-     let socket = io("http://localhost:3001", {
+     let socket = io("http://localhost:3001/challenge", {
              auth: {
                  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyRW1haWwiOiJweGlrNDUwNUBweGlrLmNvbSIsImlhdCI6MTYwNzc4NzkxMSwiZXhwIjoxNjA4NjUxOTExfQ.gQ3_sNvtB_QPkArcIPQFXBXoL3PPlYdipyxVqylrwOY"
              }
          });
+     console.log("client.html");
 
      socket.emit("onlineUsers");
 
