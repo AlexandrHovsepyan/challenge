@@ -2,6 +2,8 @@ import { Repository } from "typeorm";
 import { User } from "app/modules/users/model";
 import { userSignUpSchema, userSignInSchema } from "app/validators/user";
 import { dbManagerInstance } from "app/db/dbManager";
+import { AuthenticationError } from "app/errors/AuthenticationError";
+import { ConflictError } from "app/errors/ConflictError";
 
 export default class UserService {
     private userRepository: Repository<User>;
@@ -26,7 +28,7 @@ export default class UserService {
         const userInDb = await this.findOneByEmail(value.email);
 
         if (userInDb) {
-            throw new Error("User with this email already exists");
+            throw new ConflictError("User with this email already exists");
         }
 
         const newUser = new User();
@@ -49,7 +51,7 @@ export default class UserService {
         const userInDb = await this.findOneByEmail(value.email);
 
         if (!userInDb) {
-            throw new Error("Wrong email or password");
+            throw new AuthenticationError("Wrong email or password");
         }
 
         const isValid = await userInDb.comparePassword(value.password);
@@ -57,6 +59,6 @@ export default class UserService {
             return userInDb;
         }
 
-        throw new Error("Wrong email or password");
+        throw new AuthenticationError("Wrong email or password");
     }
 }

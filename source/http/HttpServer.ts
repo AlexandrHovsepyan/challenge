@@ -8,6 +8,7 @@ import { authRouter } from "app/modules/auth/router";
 import { userRouter } from "app/modules/users/router";
 import { IStartManager } from "app/types/IStartManager";
 import SocketController from "app/lib/socket";
+import { error404Handler, errorPageHandler } from "app/utils/router/CommonMiddleware";
 
 export class HttpServer implements IStartManager {
     private static instance: HttpServer;
@@ -58,14 +59,8 @@ export class HttpServer implements IStartManager {
         this.app.use("/auth", authRouter);
         this.app.use("/users", userRouter);
 
-        this.app.use((error, req, res, next) => {
-            //todo must improved (Error classes and statuses)
-            console.log(error);
-            res.status(error.status || 500).json({
-                message: "Something went wrong",
-                error: error.message || error
-            });
-        });
+        this.app.use(error404Handler);
+        this.app.use(errorPageHandler);
 
         this.server.listen(this.port, () => {
             console.log(`Server is running in http://localhost:${this.port}`);
