@@ -17,7 +17,6 @@ class AuthController {
             const token = generateToken(user.email);
             return res.status(201).json({
                 success: true,
-                userEmail: user.email,
                 token
             });
         } catch (error) {
@@ -38,7 +37,6 @@ class AuthController {
             const token = generateToken(user.email);
             return res.status(200).json({
                 success: true,
-                userEmail: user.email,
                 token
             });
         } catch (error) {

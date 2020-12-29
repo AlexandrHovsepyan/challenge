@@ -81,7 +81,7 @@ export default class SocketController {
             let onlineUsers = await cacheDbInstance.getKeysFromCache();
             let indexOfCurrentUser = onlineUsers.indexOf(userEmail);
             onlineUsers.splice(indexOfCurrentUser, 1);
-            socket.emit(socketSource.ONLINE_USERS_LIST, JSON.stringify(onlineUsers));
+            socket.emit(socketSource.ONLINE_USERS_LIST, onlineUsers);
         } catch (error) {
             this.handleError(socket, error);
         }
@@ -122,8 +122,8 @@ export default class SocketController {
     }
 
     private handleError(socket: Socket, error: Error) {
-        socket.emit(socketSource.CONNECTION_ERROR, {
-            message: 'Unable to connect',
+        socket.emit(socketSource.SERVER_SOCKET_ERROR, {
+            message: error.message || "Something went wrong",
             error
         });
     }
