@@ -25,7 +25,7 @@ export default class SocketController {
             pubClient: cacheDbInstance.cacheServiceClient,
             subClient: cacheDbInstance.cacheServiceClient.duplicate()
         }));
-        this.emmitConnection();
+        this.emitConnectionAndListeners();
     }
 
     public static attach(io: Server): void {
@@ -49,7 +49,7 @@ export default class SocketController {
         }
     }
 
-    public emmitConnection(): void {
+    public emitConnectionAndListeners(): void {
         this.challenge.use(this.socketAuthentication);
 
         this.challenge.on("connection", async (socket: Socket) => {
@@ -67,6 +67,10 @@ export default class SocketController {
 
             socket.on(socketSource.APPROVE_CHALLENGE_REQUEST, (receiverEmail: string) => {
                 this.makeChallenge(socket, userEmail, receiverEmail);
+            });
+
+            socket.on(socketSource.CANCEL_CHALLENGE_REQUEST, (receiverEmail: string) => {
+                this.cancelChallengeRequest(socket, receiverEmail, userEmail);
             });
 
             socket.on("disconnect", async () => {
@@ -116,6 +120,15 @@ export default class SocketController {
             socket.join(roomName);
             this.challenge.sockets.get(receiverSocketId).join(roomName);
             this.challenge.to(roomName).emit(socketSource.START_GAME, questions);
+        } catch (error) {
+            this.handleError(socket, error);
+        }
+    }
+
+    private async cancelChallengeRequest(socket: Socket, receiverEmail: string, senderEmail: string) {
+        try {
+            const receiverSocketId = await cacheDbInstance.getFromCache(receiverEmail);
+            this.challenge.to(receiverSocketId).emit(socketSource.CHALLENGE_REQUEST_CANCELED, senderEmail);
         } catch (error) {
             this.handleError(socket, error);
         }
