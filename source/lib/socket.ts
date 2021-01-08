@@ -5,18 +5,23 @@ import { cacheDbInstance } from "app/lib/cacheDb";
 import { socketSource } from "app/enums/socket";
 
 const questions = [{
-    question: "Asdfasfaf",
-    answers: ["a", "b", "c", "d"],
-    rightAnswer: "b"
+    question: "question1",
+    answers: ["answer1", "answer2", "answer3", "answer4"],
+    rightAnswer: 1
 }, {
-    question: "Asdfasfaf",
-    answers: ["a", "b", "c", "d"],
-    rightAnswer: "d"
+    question: "question2",
+    answers: ["answer1", "answer2", "answer3", "answer4"],
+    rightAnswer: 3
+}, {
+    question: "question3",
+    answers: ["answer1", "answer2", "answer3", "answer4"],
+    rightAnswer: 2
 }];
 
 export default class SocketController {
     private readonly socket: Server;
     private challenge: Namespace;
+    private gameRoomName: string;
 
     constructor(io: Server) {
         this.socket = io;
@@ -73,6 +78,10 @@ export default class SocketController {
                 this.cancelChallengeRequest(socket, receiverEmail, userEmail);
             });
 
+            socket.on(socketSource.CHOOSE_SOME_ANSWER, (questionIndex: number, answerIndex: number) => {
+                this.chooseSomeAnswer(socket, questionIndex, answerIndex);
+            });
+
             socket.on("disconnect", async () => {
                 this.userDisconnected(socket, userEmail);
             });
@@ -89,7 +98,6 @@ export default class SocketController {
         } catch (error) {
             this.handleError(socket, error);
         }
-
     }
 
     private async userDisconnected(socket: Socket, userEmail: string) {
@@ -119,6 +127,7 @@ export default class SocketController {
             const roomName = receiverEmail + senderEmail;
             socket.join(roomName);
             this.challenge.sockets.get(receiverSocketId).join(roomName);
+            this.gameRoomName = roomName;
             this.challenge.to(roomName).emit(socketSource.START_GAME, questions);
         } catch (error) {
             this.handleError(socket, error);
@@ -129,6 +138,14 @@ export default class SocketController {
         try {
             const receiverSocketId = await cacheDbInstance.getFromCache(receiverEmail);
             this.challenge.to(receiverSocketId).emit(socketSource.CHALLENGE_REQUEST_CANCELED, senderEmail);
+        } catch (error) {
+            this.handleError(socket, error);
+        }
+    }
+
+    private chooseSomeAnswer(socket: Socket, question: number, answer: number) {
+        try {
+            socket.broadcast.to(this.gameRoomName).emit(socketSource.ANSWER_CHOSEN, question, answer);
         } catch (error) {
             this.handleError(socket, error);
         }
