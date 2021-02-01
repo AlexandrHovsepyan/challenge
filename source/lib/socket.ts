@@ -54,6 +54,17 @@ export default class SocketController {
         }
     }
 
+    public on(event: socketSource, handler: (...args: any[]) => void) {
+        this.challenge.on(event, handler);
+    }
+
+    public async useSocket(email: string, fn: (socket: Socket) => void) {
+        const receiverSocketId = await cacheDbInstance.getFromCache(email);
+        const socket = this.challenge.sockets.get(receiverSocketId);
+        fn(socket);
+    }
+
+
     public emitConnectionAndListeners(): void {
         this.challenge.use(this.socketAuthentication);
 
